@@ -1,4 +1,5 @@
-#carries out ADMET analysis of compounds
+#calculates Lipinki's Properties 
+
 
 import csv
 from rdkit import Chem
@@ -9,37 +10,22 @@ import pandas as pd
 df1 = pd.read_csv('D:/Uday Paper/ADMET for IMPPAT Files/admet_properties.csv')
 smiles_list = df1['SMILES_form'].iloc[:17844].tolist()
 
-def calculate_admet(smiles):
+def calculate_rdkit_properties(smiles):
     # Convert SMILES to RDKit molecule
     mol = Chem.MolFromSmiles(smiles)
     
     if mol is None:
         raise ValueError(f"Invalid SMILES notation: {smiles}")
     
-    # Example properties calculation
+    # Calculate molecular properties
     properties = {
         "SMILES": smiles,
         "MolecularWeight": Descriptors.MolWt(mol),
         "LogP": Descriptors.MolLogP(mol),
-        "TPSA": Descriptors.TPSA(mol),  # Topological Polar Surface Area
+        "TPSA": Descriptors.TPSA(mol),
         "NumHDonors": Descriptors.NumHDonors(mol),
         "NumHAcceptors": Descriptors.NumHAcceptors(mol)
     }
-    
-    # Placeholder for actual ADMET prediction
-    # You would typically use an external service here
-    # For example, you could send a request to ADMETlab API
-    
-    admet_predictions = {
-        "Absorption": "High",  # Placeholder value
-        "Distribution": "Low",  # Placeholder value
-        "Metabolism": "Low",  # Placeholder value
-        "Excretion": "Medium",  # Placeholder value
-        "Toxicity": "Low"  # Placeholder value
-    }
-    
-    # Combine basic properties with ADMET predictions
-    properties.update(admet_predictions)
     
     return properties
 
@@ -47,13 +33,13 @@ def calculate_admet(smiles):
 results = []
 for smiles in smiles_list:
     try:
-        properties = calculate_admet(smiles)
+        properties = calculate_rdkit_properties(smiles)
         results.append(properties)
     except ValueError as e:
         print(e)
 
 # Define CSV file name
-csv_file = 'admet_properties_test150.csv'
+csv_file = 'rdkit_properties_output.csv'
 
 # Write the results to the CSV file
 with open(csv_file, mode='w', newline='') as file:
